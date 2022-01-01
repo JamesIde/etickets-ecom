@@ -1,10 +1,13 @@
 ﻿using eTickets.Data.Enums;
+using eTickets.Data.Static;
 using eTickets.Models;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace eTickets.Data
 {
@@ -325,5 +328,75 @@ namespace eTickets.Data
             }
 
         }
+
+        public static async Task SeedRolesUsers(IApplicationBuilder applicationBuilder)
+        {
+            using (var serviceScope = applicationBuilder.ApplicationServices.CreateScope())
+            {
+                //Create Roles using RoleManager Class
+                var roleManager = serviceScope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+                string adminUserEmail = "admin@etickets.com";
+                string customerEmail = "user@etickets.com";
+                string demoUserEmail = "demo@etickets.com";
+
+                //Check if roles exist
+                if (!await roleManager.RoleExistsAsync(UserRoles.Admin))
+                {
+                    await roleManager.CreateAsync(new IdentityRole(UserRoles.Admin));
+                }
+                if (!await roleManager.RoleExistsAsync(UserRoles.User))
+                {
+                    await roleManager.CreateAsync(new IdentityRole(UserRoles.User));
+
+                }
+                
+
+
+                //Create default user
+                var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+                var adminUser = await userManager.FindByEmailAsync(adminUserEmail);
+                var customerUser = await userManager.FindByEmailAsync(customerEmail);
+                //var demoUser = await userManager.FindByEmailAsync(demoUserEmail);
+
+
+                if (adminUser == null)
+                {
+                    //Create new adminuser
+
+                    var newAdminUser = new ApplicationUser()
+                    {
+                        FullName = "Admin User",
+                        UserName = "admin",
+                        Email = adminUserEmail,
+                        EmailConfirmed = true
+                    };
+
+                    //Add user, with password [ROLE NOT ASSIGNED YET]
+                    await userManager.CreateAsync(newAdminUser, "Admin123*");
+
+                    //add to role asycn checks db, then adds role [ROLE GETS ASSIGNED HERE]
+                    await userManager.AddToRoleAsync(newAdminUser, UserRoles.Admin);
+                }
+                
+                if (customerUser == null)
+                {
+                    var newCustomerUser = new ApplicationUser()
+                    {
+                        FullName = "User",
+                        UserName = "User",
+                        Email = customerEmail,
+                        EmailConfirmed = true
+                    };
+                    //Add user, with password [ROLE NOT ASSIGNED YET]
+                    await userManager.CreateAsync(newCustomerUser, "User123*");
+
+                    //add to role asycn checks db, then adds role [ROLE GETS ASSIGNED HERE]
+                    await userManager.AddToRoleAsync(newCustomerUser, UserRoles.User);
+                }
+            }
+        }
+
     }
 }

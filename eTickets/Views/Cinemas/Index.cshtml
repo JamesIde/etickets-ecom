@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<Cinema>
 
 @{
-    ViewData["Title"] = "List of Cinema";
+    ViewData["Title"] = "List of Cinemas";
 }
 
 <div class="row">
@@ -9,11 +9,14 @@
 
         <table class="table">
             <thead>
-                <tr class="">
+                <tr class="text-center">
                     <th>@Html.DisplayNameFor(model => model.Logo)</th>
                     <th>@Html.DisplayNameFor(model => model.Name)</th>
                     <th>@Html.DisplayNameFor(model => model.Description)</th>
-                    <th>Actions</th>
+                    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                    {
+                        <th>Actions</th>
+                    }
                 </tr>
             </thead>
             <tbody>
@@ -29,11 +32,15 @@
                         <td class="align-middle">
                             @Html.DisplayFor(modelItem => item.Description)
                         </td>
-                        <td class="align-middle">
-                            <a class="btn btn-outline-primary"><i class="bi bi-pencil-square"></i>Edit </a> |
-                            <a class="btn btn-outline-info"><i class="bi bi-eye"></i>Details </a>
-                           
-                        </td>
+                        @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                        {
+
+                            <td class="align-middle">
+                                <a class="btn btn-outline-primary" asp-action="Edit" asp-route-id="@item.Id"><i class="bi bi-pencil-square"></i>Edit </a> |
+                                <a class="btn btn-outline-info" asp-action="Details" asp-route-id="@item.Id"><i class="bi bi-eye"></i>Details </a> |
+                                <a class="btn btn-danger text-white" asp-action="Delete" asp-route-id="@item.Id"><i class="bi bi-trash"></i>Delete </a>
+                            </td>
+                        }
                     </tr>
                 }
             </tbody>
@@ -41,4 +48,6 @@
         </table>
 
     </div>
-</div> 
+</div>
+
+@await Html.PartialAsync("_CreateItem","Cinemas");

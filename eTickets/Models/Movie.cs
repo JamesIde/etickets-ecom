@@ -1,4 +1,5 @@
 ﻿using eTickets.Data;
+using eTickets.Data.BaseRepository;
 using eTickets.Data.Enums;
 using System;
 using System.Collections.Generic;
@@ -9,22 +10,19 @@ using System.Threading.Tasks;
 
 namespace eTickets.Models
 {
-    public class Movie
+    public class Movie : IEntityBase
     {
         [Key]
         public int Id { get; set; }
+
         public string Name { get; set; }
         public string Description { get; set; }
         public double Price { get; set; }
         public string ImageURL { get; set; }
-        public int WatchTime { get; set; }
-
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-
-        //Enum type movie category
-        //User-defined value type used to represent a list of named integer constants
         public MovieCategory MovieCategory { get; set; }
+        public int WatchTime { get; set; }
         //Relationships
         public List<Actor_Movie> Actors_Movies { get; set; }
 

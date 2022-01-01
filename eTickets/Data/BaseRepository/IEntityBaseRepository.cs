@@ -1,19 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace eTickets.Data.BaseRepository
 {
-    public interface IEntityBaseRepository<T> where T : class, IEntityBase
+    public interface IEntityBaseRepository<T> where T : class, IEntityBase, new()
     {
-        //Generic solution for crud operations for cinema, producer, etc
-
-        public Task<IEnumerable<T>> Get();
-        public Task<T> GetById(int id);
-        public Task Delete(int id);
-        public Task Create(T entity);
-        public Task Update(int actorId, T entity);
-
-
-
+        Task<IEnumerable<T>> GetAllAsync();
+        Task<IEnumerable<T>> GetAllAsync(params Expression<Func<T, object>>[]includeProperties);
+        Task<T> GetByIdAsync(int id);
+        Task AddAsync(T entity);
+        Task UpdateAsync(int id, T entity);
+        Task DeleteAsync(int id);
     }
+
 }
+
